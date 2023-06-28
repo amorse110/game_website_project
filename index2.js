@@ -1,6 +1,7 @@
 // GLOBALS
 let currentURL;
 let currentGame;
+let favoritesOn = false;
 // DOM SELECTORS
 const select = document.querySelector("select");
 const optionSelect = document.createElement("option");
@@ -14,7 +15,9 @@ const optionRacing = document.createElement("option");
 const optionCardGames = document.createElement("option");
 const optionFantasy = document.createElement("option");
 const gameList = document.querySelector("#game-list");
-const dropDownDiv = document.querySelector("#drop-down");
+const dropDownDiv = document.querySelector("#drop-down-genres");
+// const dropDownDiv = document.querySelector("#drop-down");
+const dropDownFav = document.querySelector("#drop-down-favorite");
 const body = document.querySelector("body");
 const form = document.querySelector("#search-form");
 
@@ -56,6 +59,36 @@ select.addEventListener("change", () => {
   }
 });
 
+dropDownFav.addEventListener("click", (e) => {
+  if (e.target.classList.contains("up")) {
+    dropDownFav.textContent = "Unselect: Favorites";
+    dropDownFav.style.background = "#5c636a";
+
+    favoritesOn = true;
+    e.target.classList.remove("up");
+    e.target.classList.add("down");
+    favoriteGameList().then((data) => {
+      gameList.innerHTML = "";
+      data.forEach((game) => {
+        handleGameList(game);
+      });
+    });
+  } else if (e.target.classList.contains("down")) {
+    dropDownFav.textContent = "Select: Favorites";
+    dropDownFav.style.background = "#6c757d";
+    favoritesOn = false;
+    e.target.classList.add("up");
+    e.target.classList.remove("down");
+    getGames(url).then((data) => {
+      gameList.innerHTML = "";
+      currentURL = url;
+      for (let i = 0; i < 18; i++) {
+        handleGameList(data[i]);
+      }
+    });
+  }
+});
+
 // Adding Search functionality
 form.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -70,7 +103,6 @@ form.addEventListener("submit", (e) => {
       });
     });
   } else if (search.trim() === "") {
-    // console.log("hello");
     gameList.innerHTML = "";
     getGames(currentURL).then((data) => {
       data.forEach((game) => {
@@ -94,8 +126,39 @@ function getGames(url) {
   return fetch(url, options).then((res) => res.json());
 }
 
-function favoriteGames() {
-  fetch("http://localhost:3000/favorites").then((res) => res.json());
+function favoriteGames(id) {
+  return fetch(`http://localhost:3000/favorites/${id}`).then((res) =>
+    res.json()
+  );
+}
+
+function favoriteGameList() {
+  return fetch("http://localhost:3000/favorites").then((res) => res.json());
+}
+
+function favoriteGame(id) {
+  return fetch(`http://localhost:3000/favorites/${id}`).then((res) =>
+    res.json()
+  );
+}
+function addFavoriteGame(game) {
+  newGame = game;
+  newGame.favorite = true;
+  return fetch(`http://localhost:3000/favorites`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newGame),
+  }).then((res) => res.json());
+}
+function deleteFavoriteGame(id) {
+  return fetch(`http://localhost:3000/favorites/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((res) => res.json());
 }
 
 getGames(url).then((data) => {
@@ -119,31 +182,41 @@ function handleGameList(game) {
   image.classList.add("img-fluid");
   p.classList.add("description-wrapper");
   div.classList.add("col-md-4", "col-sm-6", "card");
-  star.textContent = "☆";
-  // star.addEventListener("click", (e) => {
-  //   console.log(e.target);
-  // });
+  star.classList.add("star-empty");
   star.style = "color: gold";
   star.classList.add("star");
-  star.classList.add("star-empty");
-  title.textContent = game.title;
-
-  // Apply flexbox layout to the titleContainer
-  titleContainer.classList.add(
-    "d-flex",
-    // "align-items-center",
-    "justify-content-between"
-  );
-  titleContainer.append(title, star); // Append title and span to the titleContainer
-
   header.classList.add("row");
-  header.append(titleContainer); // Append the titleContainer to the header
 
   image.src = game.thumbnail;
   p.textContent = game.short_description;
+
+  star.textContent = "☆";
+  title.textContent = game.title;
   bottomDiv.textContent = `Publisher: ${game.publisher}`;
 
+  titleContainer.classList.add("d-flex", "justify-content-between");
+  titleContainer.append(title, star);
+  header.append(titleContainer);
   div.append(image, header, p, bottomDiv);
+  // div.append(image, header, p, bottomDiv); // changing order of image/header could be cool
+  gameList.append(div);
+
+  favoriteGameList().then((data) => {
+    data.forEach((favoriteGame) => {
+      if (favoriteGame.id === game.id) {
+        if (favoriteGame.favorite) {
+          star.textContent = "★";
+          star.classList.remove("star-empty");
+          star.classList.add("star-full");
+        } else {
+          star.textContent = "☆";
+          star.classList.remove("star-full");
+          star.classList.add("star-empty");
+        }
+      }
+    });
+  });
+
   div.addEventListener("mouseenter", (e) => {
     p.classList.remove("description-wrapper");
   });
@@ -151,22 +224,30 @@ function handleGameList(game) {
     p.classList.add("description-wrapper");
   });
 
-  div.append(header, image, p, bottomDiv);
-  gameList.append(div);
-
   div.addEventListener("click", (e) => {
-    console.log(e.target.classList[0]);
-    if (e.target.classList[0] === "star") {
+    if (
+      e.target.classList[0] === "star" ||
+      e.target.classList[0] === "star-full" ||
+      e.target.classList[0] === "star-empty"
+    ) {
       if (star.classList.contains("star-empty")) {
         star.classList.remove("star-empty");
         star.classList.add("star-full");
+        addFavoriteGame(game).then((data) => {
+          data;
+        });
+
+        // Update our star
         star.textContent = "★";
       } else if (star.classList.contains("star-full")) {
         star.classList.remove("star-full");
         star.classList.add("star-empty");
         star.textContent = "☆";
+        deleteFavoriteGame(game.id);
+        if (favoritesOn) {
+          e.target.parentNode.parentNode.parentNode.remove();
+        }
       }
-      // Maybe add event listener here.
       return;
     } else {
       let expandedCard = document.createElement("div");
@@ -177,14 +258,26 @@ function handleGameList(game) {
       const expandedLinkToGame = document.createElement("a");
       const expandedBottomDiv = document.createElement("div");
       const expandedH3 = document.createElement("h3");
+      let expandedTitle = document.createElement("span");
+      let expandedStar = document.createElement("span");
+      const expandedTitleContainer = document.createElement("div");
 
       expandedImage.src = game.thumbnail;
-      expandedH3.textContent = game.title;
       expandedP.textContent = game.short_description;
       expandedBottomDiv.textContent = `Publisher: ${game.publisher}`;
       expandedLinkToGame.href = game.game_url;
       expandedLinkToGame.target = "_blank";
       expandedLinkToGame.textContent = "Click here to play!";
+
+      let copyStar = star.cloneNode(true);
+      expandedStar = copyStar;
+
+      expandedH3.classList.add("row");
+      expandedTitle = game.title;
+      expandedTitleContainer.classList.add("d-flex", "justify-content-between");
+      expandedTitleContainer.append(expandedTitle, expandedStar);
+      expandedH3.append(expandedTitleContainer);
+
       expandedDiv.append(
         expandedH3,
         expandedImage,
@@ -194,17 +287,38 @@ function handleGameList(game) {
       );
       expandedDiv.classList.add("col-md-4", "col-sm-6", "card");
       expandedCard.append(expandedDiv);
-
-      // Append the expanded card to the body
       document.body.appendChild(expandedCard);
 
-      // Close the expanded card when clicking outside of it
       expandedCard.addEventListener("click", function (e) {
         if (e.target.classList.contains("expanded-card")) {
-          console.log(e.target);
           setTimeout(function () {
             e.target.parentNode.removeChild(e.target);
           }, 300);
+        }
+      });
+
+      expandedStar.addEventListener("click", function (e) {
+        {
+          if (expandedStar.classList.contains("star-empty")) {
+            star.classList.remove("star-empty");
+            star.classList.add("star-full");
+            expandedStar.classList.remove("star-empty");
+            expandedStar.classList.add("star-full");
+            addFavoriteGame(game).then((data) => data);
+
+            // Update our star
+            star.textContent = "★";
+            expandedStar.textContent = "★";
+          } else if (star.classList.contains("star-full")) {
+            star.classList.remove("star-full");
+            star.classList.add("star-empty");
+            expandedStar.classList.remove("star-full");
+            expandedStar.classList.add("star-empty");
+            star.textContent = "☆";
+            expandedStar.textContent = "☆";
+            deleteFavoriteGame(game.id);
+          }
+          console.log(e.target);
         }
       });
     }
