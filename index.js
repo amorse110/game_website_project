@@ -2,6 +2,7 @@
 let currentURL;
 let currentGame;
 let favoritesOn = false;
+
 // DOM SELECTORS
 const select = document.querySelector("select");
 const optionSelect = document.createElement("option");
@@ -15,8 +16,7 @@ const optionRacing = document.createElement("option");
 const optionCardGames = document.createElement("option");
 const optionFantasy = document.createElement("option");
 const gameList = document.querySelector("#game-list");
-const dropDownDiv = document.querySelector("#drop-down-genres");
-// const dropDownDiv = document.querySelector("#drop-down");
+// const genreSelector = document.querySelector("#drop-down-genres");
 const dropDownFav = document.querySelector("#drop-down-favorite");
 const body = document.querySelector("body");
 const form = document.querySelector("#search-form");
@@ -94,9 +94,6 @@ select.addEventListener("change", () => {
           handleGameList(game);
         });
       }
-
-      // const result = data.filter((game) => game.genre === select.value);
-      // console.log(result);
     });
   }
 });
@@ -152,6 +149,7 @@ form.addEventListener("submit", (e) => {
       });
     });
   }
+  form.reset();
 });
 
 // FETCHES
@@ -219,7 +217,7 @@ function handleGameList(game) {
   const header = document.createElement("h3");
   const title = document.createElement("span");
   const star = document.createElement("span");
-  const titleContainer = document.createElement("div"); // Parent container for title and span
+  const titleContainer = document.createElement("div");
 
   image.classList.add("img-fluid");
   p.classList.add("description-wrapper");
@@ -234,8 +232,8 @@ function handleGameList(game) {
 
   star.textContent = "☆";
   title.textContent = game.title;
-  bottomDiv.textContent = `Genre: ${game.genre}`;
-  // bottomDiv.textContent = `Publisher: ${game.publisher}`;
+  // bottomDiv.textContent = `Genre: ${game.genre}`;
+  bottomDiv.textContent = `Publisher: ${game.publisher}`;
 
   titleContainer.classList.add("d-flex", "justify-content-between");
   titleContainer.append(title, star);
@@ -379,53 +377,37 @@ function handleGameList(game) {
   });
 }
 
-////////////////////////////////////////////
-
-// }
-
-// EVENT HANDLERS
-
-//MANTRA
-// FETCH the data
-// SELECT DOM elements
-// CREATE new elements (if needed)
-// ASSIGN data to elements
-// APPEND elements into DOM
-
-// Stretch goals:
-// 1. create favorites button
-// 2. pagination
-
 // Populating the side columns with pics of games
 getGames(url).then((data) => {
   for (let i = 0; i < 19; i++) {
     let randomNumber1 = Math.floor(Math.random() * data.length);
     let randomNumber2 = Math.floor(Math.random() * data.length);
+
     const col1 = document.createElement("div");
     const col2 = document.createElement("div");
     const img1 = document.createElement("img");
     const img2 = document.createElement("img");
     const a1 = document.createElement("a");
     const a2 = document.createElement("a");
+
     img1.src = data[randomNumber1].thumbnail;
     img2.src = data[randomNumber2].thumbnail;
+
     img1.style.width = "211px";
     img2.style.width = "211px";
     img1.style.height = "120px";
     img2.style.height = "120px";
-    // img1.style.width = "200";
-    // img2.style.width = "200";
-    // img1.style.height = "auto";
-    // img2.style.height = "auto";
+
     col1.classList.add("mt-3");
     col2.classList.add("mt-3");
+
     a1.href = data[randomNumber1].game_url;
     a2.href = data[randomNumber2].game_url;
     a1.target = "_blank";
     a2.target = "_blank";
+
     a1.append(img1);
     a2.append(img2);
-
     col1.append(a1);
     col2.append(a2);
     adSection1.append(col1);

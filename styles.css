@@ -11,6 +11,10 @@
   text-align: center;
 } */
 
+#website-name {
+  font-family: "Courier New", Courier, monospace;
+}
+
 .row-height {
   flex-grow: 1;
 }
@@ -64,9 +68,9 @@
 }
 
 .expanded-card .card {
-  max-width: 600px;
+  max-width: 700px;
   width: 90%;
-  max-height: 600px;
+  max-height: 700px;
   overflow-y: auto;
 }
 
