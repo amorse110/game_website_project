@@ -15,4 +15,4 @@ github: [jpreuven](https://github.com/jpreuven)
 Austin Morse
 github: [amorse110](https://github.com/amorse110)
 
-WireFrame: (https://wireframe.cc/QiC7zD)
+WireFrame: https://wireframe.cc/QiC7zD
