@@ -1,6 +1,6 @@
 # Game Vault Project #
 
-![image](https://github.com/amorse110/game_website_project/assets/99285249/c40eb4e4-1a6f-46ca-8734-3996c1c47e56)
+![gameWebsiteHomePage](https://github.com/amorse110/game_website_project/assets/99285249/04ad4179-e8d3-48f4-8fb0-130c9f7c5aa6)
 
 ## Website Features: ##
   * Filter games by genre, search them by name, and add them to a list of favorites
