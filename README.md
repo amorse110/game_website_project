@@ -10,7 +10,8 @@
   * Random games auto-generate on the side of the website that, upon click, will redirect you to their website
 
 ## Getting Started ##
-To run this project locally, make sure you have JSON-server installed. Then from the terminal, run the JSON-server and watch the db.json file.
+To run this project locally, open up the HTML file and explore!
+In order to make the favorites list persist, make sure you have JSON-server installed. Then from the terminal, run the JSON-server and watch the db.json file.
 
 ## Contributors: ##
 Jonathan Paul-Reuven
