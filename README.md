@@ -6,8 +6,6 @@
 
 Game Vault is a web application that allows you to discover and explore a collection of free-to-play games from various genres. It provides a user-friendly interface for finding your favorite free games and even lets you save your favorite games for quick access.
 
-![Game Vault Screenshot](screenshot.png)
-
 ## Table of Contents
 
 - [Features](#features)
